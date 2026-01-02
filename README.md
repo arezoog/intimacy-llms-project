@@ -63,11 +63,11 @@ Arezoo Ghasemzadeh, Pearl Vishen, Arnav Akula, Sruthy Sabesan, Bhardwaj Tallapra
 - Research framework and analysis by team, led by Dr. Hilbert
 
 #### Q3 - Validation & Scoring
-- **Model Availability Research & Code**: **Bharadwaj**
-- **BWS + Validation + Kripp's Alpha**: **Arezoo**, **Pearl**
-- **Prompt Engineering**: **Sruthy**
-- **Python Scripts for Scoring (merged-script)**: **Arnav & Bharadwaj**
-- **Coding Manuals (Vulnerability, Reciprocity, etc.)**: **Dr. Hilbert**
+- **Model Availability Research & Code**: Bharadwaj
+- **BWS + Validation + Kripp's Alpha**: Arezoo**, Pearl
+- **Prompt Engineering**: Sruthy
+- **Python Scripts for Scoring (merged-script)**: Arnav & Bharadwaj
+- **Coding Manuals (Vulnerability, Reciprocity, etc.)**: Dr. Hilbert
 
 ##  Intimacy Metrics
 
