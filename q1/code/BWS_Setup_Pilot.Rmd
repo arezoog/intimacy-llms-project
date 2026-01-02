@@ -1,0 +1,282 @@
+---
+title: "BWS_Setup_Pilot"
+author: "Arezoo G"
+date: "2025-04-27"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Setting up BWS Framework
+
+```{r}
+setwd("/Users/arezoog/Desktop/AISC R&D/BWS")
+
+# Load necessary packages
+if (!requireNamespace("crossdes", quietly = TRUE)) install.packages("crossdes")
+if (!requireNamespace("support.BWS", quietly = TRUE)) install.packages("support.BWS")
+library(crossdes)
+library(support.BWS)
+
+# Set parameters
+v <- 40   # Number of unique prompts
+k <- 4    # Items per set
+r <- 12   # Times each item appears
+b <- (v * r) / k  # Number of choice sets = 120
+
+# Step 1: Load your prompts file
+prompts <- read.csv("Sampled_10_Prompts_Per_Level.csv", header = TRUE)$Prompt
+head(prompts)
+
+# Step 2: Generate the Balanced Incomplete Block Design (BIBD)
+set.seed(123) # Set seed for reproducibility
+bibd <- find.BIB(trt = v, k = k, b = b)
+
+# Check if it's a valid BIBD design
+# Note: The design will be quasi-balanced with λ ≈ 0.923 
+isGYD(bibd)
+
+# Step 3: Convert numeric IDs to actual prompts
+labeled_design <- apply(bibd, 2, function(col) prompts[col])
+
+# Step 4: Export the design for use in Qualtrics or manual formatting
+write.csv(labeled_design, "BWS_40Prompts_BIBD_Design.csv", row.names = FALSE)
+
+# to view the questionnaire format use:
+#bws.questionnaire(choice.sets = bibd, design.type = 2, item.names = prompts)
+
+
+
+
+```
+
+## BWS Pilot 
+
+* I simulate the responses here from 6 participants, n = 6 since there will be 6 of us
+* This will be replaced with our df created on the sruvey results 
+
+```{r}
+setwd("/Users/arezoog/Desktop/AISC R&D/BWS")
+
+# Load required packages
+library(crossdes)
+library(support.BWS)
+library(survival)
+
+# Load BIBD design 
+bibd <- read.csv("BWS_40Prompts_BIBD_Design.csv")
+
+# Convert string prompts back to numeric indices
+# This is necessary because bws.response needs numeric values
+numeric_bibd <- matrix(0, nrow=nrow(bibd), ncol=ncol(bibd))
+for(i in 1:nrow(bibd)) {
+  for(j in 1:ncol(bibd)) {
+    # Find the index of the prompt in your original prompts vector
+    numeric_bibd[i,j] <- which(prompts == bibd[i,j])
+  }
+}
+
+# Create parameter vector for simulating responses
+# This represents the "true" utilities the 40 items
+# Adjust these to simulate different preference patterns
+# Higher values = more preferred items
+b <- seq(from=0.1, to=4, length.out=40)
+
+# Generate simulated responses for 6 pilot participants
+set.seed(123)  # For reproducibility
+simulated_responses <- bws.response(
+  design = numeric_bibd,
+  b = b,
+  n = 6,  # 6 simulated participants
+  detail = FALSE,  # Simple format
+  seed = 123
+)
+
+# Create a dataset suitable for analysis
+response.vars <- colnames(simulated_responses)[-1]  # All except ID column
+bws_dataset <- bws.dataset(
+  data = simulated_responses,
+  response.type = 1,  # Row number format
+  choice.sets = numeric_bibd,
+  design.type = 2,  # BIBD
+  item.names = prompts,
+  id = "id",
+  response = response.vars,
+  model = "maxdiff"
+)
+
+# Analyze the data using the counting approach
+bws_counts <- bws.count(bws_dataset, cl = 2)
+summary_result <- summary(bws_counts, sort = TRUE)
+
+
+
+# Create the data frame using the top-level columns directly
+results_df <- data.frame(
+  Prompt = rownames(summary_result),  # Access rownames directly
+  B = summary_result$B,
+  W = summary_result$W,
+  BW = summary_result$BW,
+  Rank = summary_result$Rank,
+  meanB = summary_result$meanB,
+  meanW = summary_result$meanW,
+  meanBW = summary_result$meanBW,
+  mean_stdBW = summary_result$mean.stdBW,  # Note the dot here, not underscore
+  sqrtBW = summary_result$sqrtBW,
+  std_sqrtBW = summary_result$std.sqrtBW  # Note the dot here
+)
+
+# Clean up row names
+# Note: when R creates a data frame, it automatically assigns row names to that new data frame too (usually just "1", "2", "3", etc. by default, or it might inherit other values).
+rownames(results_df) <- NULL
+
+# Check if data frame has data now
+print(dim(results_df))
+head(results_df)
+
+# Save raw BWS results before any transformation
+write.csv(results_df, "bws_results_raw.csv", row.names = FALSE)
+
+```
+## Merged CSV Expalantion:
+
+* I gave the bws_results_raw.csv file and the 40 randmoly selected csv file (I created with python) to gpt 
+* Since bws switched a lot of the formatting cleaning the data by hand is not practical especially at scale
+* Output is the merged file with the bws mapped to each prompt
+
+## Statistical Analysis
+
+```{r}
+# Load required libraries
+library(tidyverse)
+library(psych)
+library(car)
+library(GGally)
+
+# Read the data
+df <- read.csv("BWS_StatisticalAnalysis.csv")
+
+head(df)
+
+# Rename columns
+df <- df %>%
+  rename(
+    BWS = `BWS.Min.Max.Normalized`,
+    P_J = `P.J.Min.Max.Normalized`,
+    Manual = `Coding.Min.Max.Normalized`
+    # Sentiment = `Bwaj.Script.score`  # Uncomment when added later
+  )
+
+# Drop any rows with missing values in key variables
+# Add script values
+df <- df %>% drop_na(BWS, P_J, Manual)  # , Sentiment
+```
+
+### A. Correlation (Convergent Validity) 
+```{r}
+cor_results <- corr.test(df[, c("BWS", "P_J", "Manual")])  # , "Sentiment"
+print(cor_results)
+```
+
+### B. Regression (Predictive Validity) 
+```{r}
+model <- lm(BWS ~ P_J + Manual, data = df)
+summary(model)
+```
+
+
+$$
+\text{BWS}_i = \beta_0 + \beta_1 \cdot (P_i) + \beta_2 \cdot (\text{Manual}_i) + \varepsilon_i
+$$
+
+- $\beta_0$ = intercept (expected BWS when all predictors are 0)  
+- $\beta_1$ = effect of LLM score ($P_J$) on BWS  
+- $\beta_2$ = effect of manual coding on BWS  
+- $\varepsilon_i$ = residual (unexplained error)
+
+$$
+\text{BWS}_i = 0.98911 - 0.96026 \cdot (P_{J_i}) + 0.07073 \cdot (\text{Manual}_i) + \varepsilon_i
+$$
+
+- Intercept: 0.98911  
+- $\beta_1$ (P_J): -0.96026 (**p < .001**, significant)  
+- $\beta_2$ (Manual): 0.07073 (**p = .637**, not significant)  
+- Residual standard error: 0.1907  
+- $R^2 = 0.649$, Adjusted $R^2 = 0.630$
+
+### Check for multicollinearity
+```{r}
+vif(model)
+```
+
+Multicollinearity occurs when predictor variables in a regression model are strongly correlated with one another, making it difficult to determine each variable’s individual contribution to the outcome. This can distort standard errors and reduce statistical power.
+
+To detect this, we use the **Variance Inflation Factor (VIF)**:
+
+\[
+\text{VIF}_j = \frac{1}{1 - R_j^2}
+\]
+
+A VIF greater than 5 (or 10 in some cases) is considered a potential red flag.
+
+
+
+### C. Rank Agreement 
+```{r}
+df <- df %>%
+  mutate(
+    BWS_rank = rank(-BWS),
+    P_J_rank = rank(-P_J),
+    Manual_rank = rank(-Manual)
+    # Sentiment_rank = rank(-Sentiment)
+  )
+
+# Rank correlation tests
+cor.test(df$BWS_rank, df$P_J_rank, method = "kendall")
+cor.test(df$BWS_rank, df$Manual_rank, method = "kendall")
+# cor.test(df$BWS_rank, df$Sentiment_rank, method = "kendall")
+```
+
+### Kendall's τ Rank Correlation Results
+
+Kendall's tau (τ) is a non-parametric measure of rank correlation that assesses the strength and direction of association between two ranked variables. It is particularly appropriate when:
+
+- Our data involve **ranked comparisons** rather than raw values
+- There are **tied ranks** (e.g., multiple prompts with the same score)
+- We want a **robust** correlation estimate in small-to-medium datasets
+
+In this analysis, we compared system-generated rankings (P&J and manual) to participant-derived BWS rankings.
+
+\[
+\tau = \text{Kendall's rank correlation coefficient}
+\]
+
+#### Results:
+
+| **Comparison**      | **Kendall's** $\tau$ | **p-value** | **Interpretation**                                       |
+|---------------------|----------------------|-------------|-----------------------------------------------------------|
+| P\_J vs BWS         | **-0.59**            | *9e-08*     | Strong inverse relationship — LLM ranks intimacy backwards |
+| Manual vs BWS       | **-0.42**            | 0.00013     | Moderate inverse relationship — coding misaligns too       |
+
+These results indicate that both the P&J and coding manual **systematically disagree with human-judged BWS rankings**, with the P&J showing a stronger inverse relationship. This suggests a potential conceptual mismatch in how intimacy is understood by automated or human-generated instruments versus participant perceptions.[EDIT THIS AFTER RESULTS]
+
+
+### D. Visualization 
+```{r}
+ggpairs(df[, c("BWS", "P_J", "Manual")])  # , "Sentiment"
+
+ggplot(df, aes(x = P_J, y = BWS)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggtitle("Pei & Jurgens vs BWS")
+
+ggplot(df, aes(x = Manual, y = BWS)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggtitle("Coding Manual vs BWS")
+
+
+```
+
+
+
