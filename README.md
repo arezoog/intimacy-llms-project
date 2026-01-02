@@ -29,10 +29,6 @@ intimacy-llms-project/
 
 ##  Team & Attribution
 
-**Advisor and PI**: Dr. Martin Hilbert
-**Lead Researcher Sep-June**: Arezoo Ghasemzadeh
-**Lead Research June-August**: Pearl Vishen
-
 **Principal Investigator & Faculty Advisor**
 Dr. Martin Hilbert — UC Davis
 
