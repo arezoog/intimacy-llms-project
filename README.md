@@ -29,7 +29,24 @@ intimacy-llms-project/
 
 ##  Team & Attribution
 
-**Primary Researcher:** Arezoo Ghasemzadeh
+**Advisor and PI**: Dr. Martin Hilbert
+**Lead Researcher Sep-June**: Arezoo Ghasemzadeh
+**Lead Research June-August**: Pearl Vishen
+
+**Principal Investigator & Faculty Advisor**
+Dr. Martin Hilbert — UC Davis
+
+**Project Lead (Sep 2024 – Jun 2025)**
+Arezoo Ghasemzadeh — UC Davis
+Project founder; designed study, modeling framework, validation protocol, and led core analysis
+
+**Project Lead (Jun 2025 – Aug 2025)**
+Pearl Vishen — UC Davis
+Coordinated later-phase data collection and continuation
+
+**Undergraduate Research Team**
+Arezoo Ghasemzadeh, Pearl Vishen, Arnav Akula, Sruthy Sabesan, Bhardwaj Tallapragada
+
 
 ### Detailed Attribution
 
@@ -41,9 +58,9 @@ intimacy-llms-project/
 - `Bharadwaj-script.ipynb` - LLM interaction scripts by **Bharadwaj**
 - `rag_dev.ipynb` - RAG development by **Arnav**
 - `intimacy_metrics.py` - Core metrics implementation by **Arnav & Bharadwaj**
-- `BWS_Setup_Pilot.Rmd` - Best-Worst Scaling setup by **Arezoo**
+- `BWS_Setup_Pilot.Rmd` - Best-Worst Scaling setup by **Arezoo, Dr. Hilbert**
 - `Arezoo_Krips.ipynb` - Krippendorff's alpha analysis by **Arezoo**
-- `Krebsbach_Krips.ipynb` - Cohen's Kappa analysis by **Arezoo**
+- `Krebsbach_Krips.ipynb` - Cohen's Kappa analysis by **Arezoo, Pearl**
 - `availmodgraphs.ipynb` - Model availability visualization by **Bharadwaj**
 
 #### Q2 - Data Collection & Analysis
