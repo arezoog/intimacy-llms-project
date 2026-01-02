@@ -2,12 +2,12 @@
 
 A research project exploring how Large Language Models (LLMs) express and evolve intimacy in human-AI interactions.
 
-## 🎯 Research Questions
+##  Research Questions
 
 1. **RQ1**: How does the level of expressed intimacy of LLMs evolve over different LLM generations?
 2. **RQ2**: How does the level of expressed intimacy of LLMs evolve within a dialogue among different users?
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 intimacy-llms-project/
@@ -27,7 +27,7 @@ intimacy-llms-project/
 └── q3/                          # Quarter 3 - [To be added]
 ```
 
-## 👥 Team & Attribution
+##  Team & Attribution
 
 **Primary Researcher:** Arezoo Ghasemzadeh
 
@@ -56,7 +56,7 @@ intimacy-llms-project/
 - **Python Scripts for Scoring (merged-script)**: **Arnav & Bharadwaj**
 - **Coding Manuals (Vulnerability, Reciprocity, etc.)**: **Hilbert**
 
-## 📊 Intimacy Metrics
+##  Intimacy Metrics
 
 The project measures intimacy through several metrics:
 
@@ -68,7 +68,7 @@ The project measures intimacy through several metrics:
 6. **Utterance Length** - Response length as intimacy indicator
 7. **Reciprocity & Engagement** - Measuring conversational reciprocity
 
-## 🔬 Hypotheses
+##  Hypotheses
 
 ### Generation Effects (H1)
 - **H1a**: Positive correlation between LLM intimacy and year of launch
@@ -80,7 +80,7 @@ The project measures intimacy through several metrics:
 - **H2c**: LLMs gradually increase intimacy with mirroring users
 - **H2d**: LLMs show inertia toward higher intimacy when users counteract
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - Python 3.x
 - spaCy (NLP processing)
@@ -89,7 +89,7 @@ The project measures intimacy through several metrics:
 - FAISS (Vector similarity for RAG)
 - Sentence Transformers (Embeddings)
 
-## 📚 Intimacy Categories
+##  Intimacy Categories
 
 The research categorizes intimacy levels as:
 
@@ -101,6 +101,10 @@ The research categorizes intimacy levels as:
 ## 📄 License
 
 This project is part of academic research. Please cite appropriately if using any materials.
+
+## Paper available on SSRN
+
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5634210
 
 ---
 
